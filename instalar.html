@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E5779F">
+<meta name="color-scheme" content="light">
+<meta name="description" content="Instale o Bora pra Faxina! no seu celular: a rotina da casa, um cômodo por dia, sincronizada com a família.">
+<meta property="og:title" content="Bora pra Faxina! — Instale no celular">
+<meta property="og:description" content="A rotina da casa, um cômodo por dia, sincronizada com a família.">
+<meta property="og:image" content="icons/icon-512.png">
+<title>Instalar · Bora pra Faxina!</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--acc:#E5779F;--acc2:#D9628E;--bg:#FBF8F5;--card:#FFFFFF;--ink:#2A2532;--muted:#8C8496;--line:#F0EAE5;--soft:#F6F1EC;--shadow:0 1px 2px rgba(40,30,50,.04),0 10px 30px rgba(40,30,50,.07);
+ --d1:#E5779F;--d2:#5B95DB;--d3:#45AE84;--d4:#D9A52C;--d5:#9574DB}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;font-size:15px;line-height:1.5}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit;padding:0}
+a{color:inherit}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wrap{max-width:520px;margin:0 auto;padding:0 16px 48px}
+
+/* topo */
+.hero{position:relative;text-align:center;padding:48px 8px 30px;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.18;z-index:-1}
+.b1{width:220px;height:220px;background:var(--d1);top:-60px;left:-70px}
+.b2{width:160px;height:160px;background:var(--d2);top:30px;right:-60px}
+.b3{width:120px;height:120px;background:var(--d3);bottom:-30px;left:40%}
+.appicon{width:104px;height:104px;border-radius:30px;margin:0 auto 18px;display:block;box-shadow:0 18px 40px color-mix(in srgb,var(--acc) 45%,transparent);animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-6px)}}
+h1{font-weight:900;font-size:34px;margin:0;color:var(--acc);letter-spacing:-.6px}
+.tag{color:var(--muted);font-size:16px;margin:8px auto 0;max-width:330px}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;padding:7px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
+.chip i{width:8px;height:8px;border-radius:50%}
+
+/* cartão principal */
+.card{background:var(--card);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);padding:20px;margin-bottom:14px}
+.card h2{font-weight:900;font-size:20px;margin:0 0 4px;letter-spacing:-.3px}
+.card .sub{color:var(--muted);font-size:14px;margin:0 0 16px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:18px;font-weight:800;font-size:15.5px;background:var(--acc);color:#fff;box-shadow:0 10px 24px color-mix(in srgb,var(--acc) 35%,transparent);text-decoration:none;transition:transform .15s}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:var(--soft);color:var(--ink);box-shadow:none;margin-top:10px}
+.ok{display:flex;gap:12px;align-items:center;background:color-mix(in srgb,var(--d3) 14%,var(--card));color:var(--d3);border-radius:18px;padding:14px 16px;font-weight:800;margin-bottom:14px}
+.warn{display:flex;gap:12px;align-items:flex-start;background:color-mix(in srgb,var(--d4) 16%,var(--card));border-radius:18px;padding:14px 16px;margin-bottom:14px;font-size:14px}
+.warn svg{color:var(--d4);margin-top:2px}
+
+/* abas */
+.tabs{display:flex;background:var(--soft);border-radius:99px;padding:4px;margin-bottom:16px}
+.tabs button{flex:1;padding:9px 6px;border-radius:99px;font-weight:800;font-size:13.5px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px}
+.tabs button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.panel{display:none}.panel.on{display:block;animation:in .3s}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+
+/* passos */
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--line);counter-increment:s}
+.steps li:first-child{border-top:0;padding-top:4px}
+.num{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;font-weight:900;color:#fff;flex:none;background:var(--c,var(--acc))}
+.num::before{content:counter(s)}
+.st>b{display:block;font-size:15px;font-weight:800}
+.st span b{color:var(--ink)}
+.st span{color:var(--muted);font-size:13.5px}
+.kbd{display:inline-flex;align-items:center;gap:4px;background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:1px 7px;font-weight:800;font-size:12.5px;color:var(--ink);vertical-align:1px;white-space:nowrap}
+.kbd svg.i{width:14px;height:14px}
+
+/* ilustração do celular */
+.phone{width:150px;margin:6px auto 4px;border-radius:28px;border:7px solid var(--ink);background:var(--bg);aspect-ratio:9/17;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.phone .scr{position:absolute;inset:0;display:flex;flex-direction:column}
+.phone .bar{height:26px;background:var(--soft);margin:10px 8px 0;border-radius:9px;font-size:8px;display:flex;align-items:center;padding:0 8px;color:var(--muted);font-weight:700}
+.phone .content{flex:1;margin:8px;border-radius:12px;background:color-mix(in srgb,var(--acc) 10%,var(--card))}
+.phone .tb{height:30px;display:flex;justify-content:space-around;align-items:center;background:var(--soft);color:var(--muted)}
+.phone .tb svg.i{width:14px;height:14px}
+.phone .hi{color:var(--acc);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.35)}}
+.phone .menu{position:absolute;right:8px;top:40px;background:var(--card);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.18);padding:6px;font-size:8.5px;font-weight:800;width:92px}
+.phone .menu div{padding:5px 6px;border-radius:6px;color:var(--muted)}
+.phone .menu div.hl{background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc)}
+
+/* recursos */
+.feats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.feat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:var(--shadow)}
+.feat .ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;margin-bottom:8px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.feat b{display:block;font-size:14px;font-weight:800}
+.feat span{font-size:12.5px;color:var(--muted);line-height:1.4;display:block;margin-top:2px}
+
+/* qr */
+.qr{display:flex;gap:16px;align-items:center}
+#qr{padding:10px;background:#fff;border-radius:16px;flex:none;line-height:0}
+#qr img,#qr canvas{width:120px!important;height:120px!important}
+.faq details{border-top:1px solid var(--line);padding:12px 0}
+.faq details:first-of-type{border-top:0;padding-top:0}
+.faq summary{font-weight:800;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';color:var(--acc);font-weight:900;font-size:18px;line-height:1}
+.faq details[open] summary::after{content:'–'}
+.faq p{color:var(--muted);font-size:13.5px;margin:8px 0 0}
+.foot{text-align:center;color:var(--muted);font-size:12.5px;margin-top:24px}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+ <header class="hero">
+  <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+  <img class="appicon" src="icons/icon-512.png" alt="Ícone do Bora pra Faxina!">
+  <h1>Bora pra Faxina!</h1>
+  <p class="tag">A rotina da casa, um cômodo por dia, sincronizada com toda a família.</p>
+  <div class="chips">
+   <span class="chip"><i style="background:var(--d1)"></i>Grátis</span>
+   <span class="chip"><i style="background:var(--d2)"></i>Funciona offline</span>
+   <span class="chip"><i style="background:var(--d3)"></i>Sem loja de apps</span>
+  </div>
+ </header>
+
+ <div class="ok hide" id="installed"><svg class="i" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>O app já está instalado neste aparelho.</span></div>
+
+ <div class="warn hide" id="inapp"><svg class="i" viewBox="0 0 24 24"><path d="M12 4 2.8 19.5h18.4zM12 10v4.5M12 17.2h.01"/></svg>
+  <div><b>Abra no navegador para instalar.</b><br>Você abriu o link dentro de outro app (WhatsApp, Instagram…). Toque nos <b>⋮</b> ou em <b>Compartilhar</b> e escolha <b id="inappBrowser">Abrir no navegador</b>.</div></div>
+
+ <!-- instalar -->
+ <section class="card" id="installCard">
+  <h2>Instale em 30 segundos</h2>
+  <p class="sub" id="detected">Escolha o seu aparelho:</p>
+
+  <div class="tabs" role="tablist">
+   <button data-tab="android" role="tab"><svg class="i" viewBox="0 0 24 24"><path d="M7 9h10v8a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1zM7 9a5 5 0 0 1 10 0M9.5 6.5 8 4.5M14.5 6.5 16 4.5M5 10v5M19 10v5M10 18v2.5M14 18v2.5"/></svg>Android</button>
+   <button data-tab="ios" role="tab"><svg class="i" viewBox="0 0 24 24"><path d="M15.5 3c0 1.5-1.2 3-2.8 3 0-1.6 1.3-3 2.8-3zM12.5 7.5c1 0 2-.7 3.2-.7 1.4 0 2.6.8 3.3 2-2.8 1.5-2.4 5.6.5 6.8-.6 1.6-1.8 3.9-3.4 3.9-1.2 0-1.6-.8-3-.8s-1.9.8-3 .8c-2 0-4.6-4.3-4.6-8 0-3 1.9-4.7 3.8-4.7 1.2 0 2.2.7 3.2.7z"/></svg>iPhone</button>
+   <button data-tab="pc" role="tab"><svg class="i" viewBox="0 0 24 24"><path d="M3 5h18v11H3zM8 20h8M12 16v4"/></svg>Computador</button>
+  </div>
+
+  <!-- ANDROID -->
+  <div class="panel" id="p-android">
+   <button class="btn hide" id="oneTap"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Instalar agora</button>
+   <p class="sub hide" id="oneTapNote" style="text-align:center;margin:10px 0 4px">ou siga os passos abaixo</p>
+   <div class="phone" aria-hidden="true"><div class="scr"><div class="bar">faxina.github.io<span style="margin-left:auto" class="hi">⋮</span></div><div class="content"></div><div class="tb"></div></div>
+    <div class="menu"><div>Nova guia</div><div>Favoritos</div><div class="hl">Instalar app</div><div>Compartilhar</div></div></div>
+   <ol class="steps">
+    <li style="--c:var(--d1)"><span class="num"></span><div class="st"><b>Abra este link no Chrome</b><span>O navegador padrão da maioria dos Android.</span></div></li>
+    <li style="--c:var(--d2)"><span class="num"></span><div class="st"><b>Toque nos três pontinhos <span class="kbd">⋮</span></b><span>No canto superior direito da tela.</span></div></li>
+    <li style="--c:var(--d3)"><span class="num"></span><div class="st"><b>Escolha <span class="kbd">Instalar app</span></b><span>Em alguns aparelhos aparece como <b>Adicionar à tela inicial</b>.</span></div></li>
+    <li style="--c:var(--d4)"><span class="num"></span><div class="st"><b>Confirme em <span class="kbd">Instalar</span></b><span>O ícone rosa aparece junto com os seus outros apps. ✨</span></div></li>
+   </ol>
+  </div>
+
+  <!-- iPHONE -->
+  <div class="panel" id="p-ios">
+   <div class="phone" aria-hidden="true"><div class="scr"><div class="bar">faxina.github.io</div><div class="content"></div>
+    <div class="tb"><svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg><svg class="i" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg><svg class="i hi" viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M6 11H5v10h14V11h-1"/></svg><svg class="i" viewBox="0 0 24 24"><path d="M5 5h14v14H5z"/></svg></div></div></div>
+   <ol class="steps">
+    <li style="--c:var(--d1)"><span class="num"></span><div class="st"><b>Abra este link no Safari</b><span>No iPhone, só o Safari instala apps pela web.</span></div></li>
+    <li style="--c:var(--d2)"><span class="num"></span><div class="st"><b>Toque em Compartilhar <span class="kbd"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M6 11H5v10h14V11h-1"/></svg></span></b><span>O quadrado com a seta para cima, na barra de baixo.</span></div></li>
+    <li style="--c:var(--d3)"><span class="num"></span><div class="st"><b>Role e toque em <span class="kbd">Adicionar à Tela de Início</span></b><span>Se não aparecer, toque em <b>Editar ações</b> no fim da lista.</span></div></li>
+    <li style="--c:var(--d4)"><span class="num"></span><div class="st"><b>Toque em <span class="kbd">Adicionar</span></b><span>Pronto! Abra pelo ícone na tela de início.</span></div></li>
+   </ol>
+  </div>
+
+  <!-- COMPUTADOR -->
+  <div class="panel" id="p-pc">
+   <div class="qr">
+    <div id="qr"></div>
+    <div><b style="font-size:15px">Aponte a câmera do celular</b><p class="sub" style="margin:4px 0 0">O link abre direto no seu celular, e aí é só seguir os passos de Android ou iPhone.</p></div>
+   </div>
+   <ol class="steps" style="margin-top:16px">
+    <li style="--c:var(--d5)"><span class="num"></span><div class="st"><b>Quer usar no computador também?</b><span>No Chrome ou no Edge, clique no ícone <span class="kbd"><svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H4zM12 8v5M9.5 10.5 12 13l2.5-2.5"/></svg> Instalar</span> na barra de endereço.</span></div></li>
+   </ol>
+   <button class="btn hide" id="oneTapPc" style="margin-top:6px"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Instalar no computador</button>
+  </div>
+ </section>
+
+ <a class="btn ghost" href="./"><svg class="i" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></svg>Abrir o app no navegador</a>
+
+ <!-- recursos -->
+ <h2 style="font-weight:900;font-size:20px;margin:30px 4px 12px">O que tem no app</h2>
+ <div class="feats">
+  <div class="feat" style="--c:var(--d1)"><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6M3 15h18M3 18v2M21 18v2M5 10V6.5A1.5 1.5 0 0 1 6.5 5h11A1.5 1.5 0 0 1 19 6.5V10"/></svg></div><b>Um cômodo por dia</b><span>Checklist por cômodo, com a manutenção diária junto.</span></div>
+  <div class="feat" style="--c:var(--d2)"><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .6-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z"/></svg></div><b>Família sincronizada</b><span>Todo mundo marca na mesma lista, em tempo real.</span></div>
+  <div class="feat" style="--c:var(--d4)"><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4v3h-4z"/></svg></div><b>Medalhas</b><span>Bronze, prata, ouro e sequência de dias sem atraso.</span></div>
+  <div class="feat" style="--c:var(--d3)"><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/></svg></div><b>Painel bonito</b><span>Calendário, barras por dia e quem mais ajudou.</span></div>
+  <div class="feat" style="--c:var(--d5)"><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M12 4 2.8 19.5h18.4zM12 10v4.5M12 17.2h.01"/></svg></div><b>Alerta de atraso</b><span>O que ficou para trás aparece no dia seguinte.</span></div>
+  <div class="feat" style="--c:var(--acc)"><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></div><b>Backup na nuvem</b><span>Automático todo dia, e você pode baixar também.</span></div>
+ </div>
+
+ <!-- convite -->
+ <section class="card">
+  <h2>Depois de instalar</h2>
+  <ol class="steps">
+   <li style="--c:var(--d1)"><span class="num"></span><div class="st"><b>Entre com sua conta</b><span>Google ou e-mail e senha.</span></div></li>
+   <li style="--c:var(--d2)"><span class="num"></span><div class="st"><b>Recebeu um convite? Digite o código</b><span>Toque em <b>Tenho um código de convite</b> para entrar na casa da família.</span></div></li>
+   <li style="--c:var(--d3)"><span class="num"></span><div class="st"><b>Escolha quem você é</b><span>Toque no avatar do topo para que as tarefas fiquem com o seu nome.</span></div></li>
+  </ol>
+ </section>
+
+ <!-- dúvidas -->
+ <section class="card faq">
+  <h2 style="margin-bottom:12px">Dúvidas</h2>
+  <details><summary>Preciso baixar da Play Store ou App Store?</summary><p>Não. O app é instalado direto pelo navegador, ocupa pouquíssimo espaço e se atualiza sozinho.</p></details>
+  <details><summary>Funciona sem internet?</summary><p>Sim. Você marca as tarefas normalmente e tudo é enviado para a nuvem assim que a conexão voltar.</p></details>
+  <details><summary>Não aparece a opção de instalar</summary><p>Confira se abriu no <b>Chrome</b> (Android) ou no <b>Safari</b> (iPhone), e não dentro do WhatsApp ou do Instagram. No Android, recarregue a página e espere alguns segundos.</p></details>
+  <details><summary>Meus dados ficam seguros?</summary><p>Ficam salvos na sua conta, e só quem entrou na casa com o código de convite consegue ver a lista.</p></details>
+  <details><summary>Como desinstalo?</summary><p>Do mesmo jeito que qualquer app: segure o ícone e escolha <b>Remover</b> ou <b>Desinstalar</b>. Seus dados continuam salvos na nuvem.</p></details>
+ </section>
+
+ <p class="foot">🧹 Bora pra Faxina! · feito com carinho para a rotina da casa</p>
+</div>
+
+<script>
+const ua=navigator.userAgent||'';
+const isIOS=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const isAndroid=/Android/i.test(ua);
+const inApp=/FBAN|FBAV|Instagram|WhatsApp|Line\/|Telegram|; wv\)/i.test(ua);
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const $=id=>document.getElementById(id);
+
+function show(tab){
+ document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
+ document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+tab));
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.tab));
+const tab=isIOS?'ios':isAndroid?'android':'pc';show(tab);
+$('detected').textContent=isIOS?'Detectamos um iPhone. Veja como fazer:':isAndroid?'Detectamos um Android. Veja como fazer:':'Você está no computador. Abra no celular:';
+
+if(standalone){$('installed').classList.remove('hide')}
+if(inApp){$('inapp').classList.remove('hide');$('inappBrowser').textContent=isIOS?'Abrir no Safari':'Abrir no Chrome'}
+
+// QR code com o endereço desta página
+try{new QRCode($('qr'),{text:location.href.split('#')[0],width:240,height:240,colorDark:'#2A2532',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M})}
+catch(e){$('qr').innerHTML='<div style="width:120px;height:120px;display:grid;place-items:center;color:#8C8496;font-size:12px;line-height:1.4;text-align:center">Copie o link<br>da barra de<br>endereço</div>'}
+
+// Instalação com um toque (Chrome / Edge / Android)
+let deferred=null;
+addEventListener('beforeinstallprompt',e=>{
+ e.preventDefault();deferred=e;
+ ['oneTap','oneTapNote','oneTapPc'].forEach(id=>$(id).classList.remove('hide'));
+});
+async function install(){
+ if(!deferred)return;deferred.prompt();
+ const r=await deferred.userChoice;deferred=null;
+ ['oneTap','oneTapNote','oneTapPc'].forEach(id=>$(id).classList.add('hide'));
+ if(r.outcome==='accepted')$('installed').classList.remove('hide');
+}
+$('oneTap').onclick=install;$('oneTapPc').onclick=install;
+addEventListener('appinstalled',()=>{$('installed').classList.remove('hide');['oneTap','oneTapNote','oneTapPc'].forEach(id=>$(id).classList.add('hide'))});
+
+// O service worker precisa estar ativo para o navegador oferecer a instalação
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
