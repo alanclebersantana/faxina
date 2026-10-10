@@ -260,21 +260,21 @@ img.av{display:block}
 <div id="modal"></div>
 <script>
 /* =====================================================================
-   CONFIGURAÇÃO DO 
+   CONFIGURAÇÃO DO FIREBASE
    Cole aqui o objeto firebaseConfig do seu projeto
    (Console do Firebase → Configurações do projeto → Seus apps → App da Web)
    ===================================================================== */
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyACop0MP4sckE0NWfvyZVtmoyd8aImeHlk",
-  authDomain: "faxina-6d933.firebaseapp.com",
-  projectId: "faxina-6d933",
-  storageBucket: "faxina-6d933.firebasestorage.app",
-  messagingSenderId: "100162698356",
-  appId: "1:100162698356:web:7dc906d784c6a838e32521"
+  apiKey: "COLE_AQUI_SUA_API_KEY",
+  authDomain: "SEU-PROJETO.firebaseapp.com",
+  projectId: "SEU-PROJETO",
+  storageBucket: "SEU-PROJETO.appspot.com",
+  messagingSenderId: "000000000000",
+  appId: "1:000000000000:web:0000000000000000"
 };
 /* Chave das notificações push (Firebase → Configurações do projeto → Cloud Messaging →
    Certificados push da Web → Gerar par de chaves). Cole a chave pública aqui. */
-const FIREBASE_VAPID_KEY = "BINnvxQOz0H7jbadQKwBHwv8w3xdSq6RdIerVerF7b9LWYqBG9cVH2Xx-pCKyz2At7DAbEUMWmDm6R9RsICxe34";
+const FIREBASE_VAPID_KEY = "COLE_AQUI_SUA_VAPID_KEY";
 const APP_VERSION = '1.1.0';
 
 /* ---------- ícones ---------- */
@@ -1047,7 +1047,7 @@ function lembretesCard(){
   h+=ls.map(l=>`<div class="lrow ${l.ativo?'':'off'}"><button class="lmain" data-act="lemEdit" data-id="${l.id}"><span class="ri" style="--rc:var(--acc)">${ic((TIPOS[l.tipo]||TIPOS.livre).i)}</span><span class="lt"><b>${esc(l.hora)}</b> · ${esc(l.tipo==='livre'&&l.msg?l.msg:(TIPOS[l.tipo]||TIPOS.livre).n)}<small>${diasTxt(l)}</small></span></button><button class="lsw ${l.ativo?'on':''}" data-act="lemToggle" data-id="${l.id}" aria-label="Ligar ou desligar"><i></i></button></div>`).join('')||'<div class="empty">Nenhum lembrete. Crie um abaixo.</div>';
   h+=`<button class="btn full" style="margin-top:10px" data-act="lemNew">${ic('plus')} Novo lembrete</button>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><button class="btn" data-act="pushTest">${ic('bell','style="width:15px;height:15px"')} Testar</button><button class="btn red" data-act="pushOff">Desativar</button></div>
-  
+  <p class="note" style="text-align:left">Cada aparelho tem os próprios lembretes. Eles chegam por volta do horário escolhido (o GitHub pode atrasar alguns minutos) e só avisam quando faz sentido (ex.: "Se faltar algo" não toca se o dia já estiver completo).</p>`;
  }
  return h+'</div>';
 }
@@ -1077,7 +1077,7 @@ Object.assign(A,{
  pushOff:async()=>{await pushRemove();L.push.on=false;saveLocal();render();toast('Lembretes desativados neste aparelho')},
  pushAskNo:()=>{L.pushAsk=1;saveLocal();render()},
  pushTest:async()=>{
-  try{const reg=await navigator.serviceWorker.ready;await reg.showNotification('🔔 Assim chegam os lembretes',{body:'Teste local. Em até 15 min chega também um teste enviado pelo servidor.',icon:'icons/icon-192.png',badge:'icons/badge-96.png',tag:'bpf-teste-local'})}catch(e){toast('Não foi possível mostrar a notificação: '+e.message)}
+  try{const reg=await navigator.serviceWorker.ready;await reg.showNotification('🔔 Assim chegam os lembretes',{body:'Teste local. Em poucos minutos chega também um teste enviado pelo servidor.',icon:'icons/icon-192.png',badge:'icons/badge-96.png',tag:'bpf-teste-local'})}catch(e){toast('Não foi possível mostrar a notificação: '+e.message)}
   devRef().set({teste:true,proximo:Date.now()},{merge:true}).catch(e=>toast('Erro ao agendar o teste: '+(e.code||e.message)));
  },
  lemToggle:e=>{const l=L.push.lembretes.find(x=>x.id===e.dataset.id);if(!l)return;l.ativo=!l.ativo;pushSave();render()},
