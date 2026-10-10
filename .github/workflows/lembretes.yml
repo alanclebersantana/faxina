@@ -1,0 +1,49 @@
+# Envia os lembretes do Bora pra Faxina! a cada 15 minutos.
+# Configure o segredo FIREBASE_SERVICE_ACCOUNT em Settings → Secrets and variables → Actions.
+name: Lembretes
+
+on:
+  schedule:
+    # minutos "quebrados" para fugir do horário cheio, quando o GitHub fica mais lento
+    - cron: '4,19,34,49 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: lembretes
+  cancel-in-progress: false
+
+jobs:
+  enviar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: notificacoes
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependências
+        working-directory: notificacoes
+        run: npm install --omit=dev --no-audit --no-fund
+
+      - name: Enviar lembretes
+        working-directory: notificacoes
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node enviar.js
+
+      # O GitHub pausa agendamentos de repositórios sem atividade por 60 dias.
+      # Este passo pede para manter o agendamento ligado.
+      - name: Manter o agendamento ativo
+        if: github.event_name == 'schedule'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/lembretes.yml/enable"
