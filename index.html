@@ -1047,7 +1047,7 @@ function lembretesCard(){
   h+=ls.map(l=>`<div class="lrow ${l.ativo?'':'off'}"><button class="lmain" data-act="lemEdit" data-id="${l.id}"><span class="ri" style="--rc:var(--acc)">${ic((TIPOS[l.tipo]||TIPOS.livre).i)}</span><span class="lt"><b>${esc(l.hora)}</b> · ${esc(l.tipo==='livre'&&l.msg?l.msg:(TIPOS[l.tipo]||TIPOS.livre).n)}<small>${diasTxt(l)}</small></span></button><button class="lsw ${l.ativo?'on':''}" data-act="lemToggle" data-id="${l.id}" aria-label="Ligar ou desligar"><i></i></button></div>`).join('')||'<div class="empty">Nenhum lembrete. Crie um abaixo.</div>';
   h+=`<button class="btn full" style="margin-top:10px" data-act="lemNew">${ic('plus')} Novo lembrete</button>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><button class="btn" data-act="pushTest">${ic('bell','style="width:15px;height:15px"')} Testar</button><button class="btn red" data-act="pushOff">Desativar</button></div>
-  <p class="note" style="text-align:left">Cada aparelho tem os próprios lembretes. Eles chegam em até uns 15 minutos do horário escolhido e só avisam quando faz sentido (ex.: "Se faltar algo" não toca se o dia já estiver completo).</p>`;
+  
  }
  return h+'</div>';
 }
