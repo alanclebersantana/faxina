@@ -16,7 +16,7 @@ PWA em arquivo único (`index.html`), sem ferramentas de build. Hospedado no **G
 | `sw.js` | Service worker: abre o app offline e mostra as notificações |
 | `icons/` | Ícones do app (192, 512, maskable, Apple e o ícone da barra de notificações) |
 | `notificacoes/` | Script que envia os lembretes (roda no GitHub Actions) |
-| `.github/workflows/lembretes.yml` | Agenda o envio dos lembretes a cada 15 minutos |
+| `.github/workflows/lembretes.yml` | O robô que envia os lembretes |
 | `firestore.rules` | Regras de segurança do banco de dados |
 
 ---
@@ -79,7 +79,7 @@ Mande para a família o link da página de instalação: `https://SEU-USUARIO.gi
 
 ## 6. Ativar os lembretes no celular 🔔
 
-Os lembretes chegam **mesmo com o app fechado**. Quem envia é um robô gratuito do GitHub (GitHub Actions), que roda a cada 15 minutos, confere no Firebase quem tem lembrete vencido e dispara a notificação pelo Firebase Cloud Messaging. **Não precisa do plano pago do Firebase.**
+Os lembretes chegam **mesmo com o app fechado**. Quem envia é um robô gratuito do GitHub (GitHub Actions), que roda a cada 5 minutos, confere no Firebase quem tem lembrete vencido e dispara a notificação pelo Firebase Cloud Messaging. **Não precisa do plano pago do Firebase.**
 
 ### 6.1 Chave das notificações (VAPID)
 
@@ -114,7 +114,7 @@ const FIREBASE_VAPID_KEY = "BJx...sua-chave...";
 1. Abra o app **instalado** e toque em **Ativar** (no aviso da tela Hoje ou em **Ajustes → Lembretes no celular**).
 2. Permita as notificações quando o celular perguntar.
 3. Ajuste os horários e os dias como quiser. Cada aparelho tem os próprios lembretes.
-4. Toque em **Testar**. Uma notificação aparece na hora, e outra, enviada pelo robô, chega em até 15 minutos.
+4. Toque em **Testar**. Uma notificação aparece na hora, e outra, enviada pelo robô, chega em poucos minutos.
 
 | Lembrete | Quando toca |
 |---|---|
@@ -123,10 +123,37 @@ const FIREBASE_VAPID_KEY = "BJx...sua-chave...";
 | ✨ Faxina do mês | No sábado escolhido na aba Mensal, se a faxina pesada não estiver completa |
 | 💡 Mensagem livre | O texto que você escrever, nos dias e horários escolhidos |
 
+### 6.5 Relógio externo (obrigatório para tocar no horário)
+
+O agendamento do próprio GitHub não tem horário garantido: em repositórios novos ele pode levar horas para começar e costuma pular execuções. Por isso, quem dispara o robô a cada 5 minutos é o **cron-job.org**, um serviço gratuito e pontual. O agendamento do GitHub continua no arquivo só como reserva.
+
+**a) Criar uma chave do GitHub só para disparar o robô**
+1. No GitHub, clique na sua foto → **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
+2. **Token name:** `cron faxina` · **Expiration:** a maior opção disponível (ou *No expiration*).
+3. **Repository access:** *Only select repositories* → escolha o repositório do app.
+4. **Permissions → Repository permissions → Actions:** *Read and write*. Não marque mais nada.
+5. Clique em **Generate token** e copie o código (começa com `github_pat_`). Ele só aparece uma vez.
+
+**b) Configurar o cron-job.org**
+1. Crie uma conta grátis em **cron-job.org** e clique em **Create cronjob**.
+2. **Title:** `Lembretes faxina`
+3. **URL:** `https://api.github.com/repos/SEU-USUARIO/SEU-REPOSITORIO/actions/workflows/lembretes.yml/dispatches`
+4. **Execution schedule:** *Every 5 minutes*.
+5. Na aba **Advanced**:
+   - **Request method:** `POST`
+   - **Headers** (adicione os três):
+     - `Authorization` = `Bearer github_pat_...seu-token...`
+     - `Accept` = `application/vnd.github+json`
+     - `X-GitHub-Api-Version` = `2022-11-28`
+   - **Request body:** `{"ref":"main"}`
+6. Clique em **Test run**: a resposta deve ser **204** (sucesso). Depois clique em **Create**.
+7. No GitHub, a aba **Actions** passa a mostrar uma execução nova a cada 5 minutos.
+
+> Se o token expirar, o cron-job.org passa a mostrar erro 401. É só gerar um token novo e trocar no header `Authorization`.
+
 **Bom saber:**
 - **iPhone:** funciona no iOS 16.4 ou mais novo, e só com o app **instalado na tela de início** pelo Safari.
-- **Precisão:** o GitHub pode atrasar alguns minutos, principalmente na hora cheia. O lembrete chega em até uns 15 minutos do horário. Se o atraso passar de 2 horas, aquele lembrete é pulado para não tocar fora de hora.
-- **Repositório parado:** o GitHub pausa agendamentos de repositórios sem nenhuma atividade por 60 dias. O robô tenta se manter ligado sozinho, mas se você receber um e-mail do GitHub avisando da pausa, é só abrir **Actions → Lembretes → Enable workflow**.
+- **Precisão:** com o relógio externo (6.5) disparando a cada 5 minutos, o robô já envia o que vence nos 3 minutos seguintes, então o lembrete chega por volta do horário escolhido. Se um envio atrasar mais de 2 horas, aquele lembrete é pulado para não tocar fora de hora.
 - **Custo:** o GitHub Actions é gratuito em repositórios públicos (como os do GitHub Pages gratuito), e o envio pelo Firebase Cloud Messaging também é gratuito.
 
 ---

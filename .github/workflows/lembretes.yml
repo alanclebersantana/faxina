@@ -1,4 +1,6 @@
-# Envia os lembretes do Bora pra Faxina! a cada 5 minutos.
+# Envia os lembretes do Bora pra Faxina!
+# Quem dispara a cada 5 minutos é o cron-job.org (veja o README, seção 6.5).
+# O agendamento abaixo fica só como reserva: o do GitHub não tem horário garantido.
 # Configure o segredo FIREBASE_SERVICE_ACCOUNT em Settings → Secrets and variables → Actions.
 name: Lembretes
 

@@ -133,6 +133,7 @@ async function rodar({ db, messaging, agora = Date.now(), log = console.log, ant
     return cache.get(path);
   };
   const snap = await db.collection('dispositivos').where('proximo', '<=', limite).get();
+  log(`Agora em São Paulo: ${new Date(agora).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`);
   log(`${snap.size} aparelho(s) com lembrete vencido`);
   const tot = { enviados: 0, pulados: 0, removidos: 0, erros: 0 };
 
@@ -169,10 +170,13 @@ async function rodar({ db, messaging, agora = Date.now(), log = console.log, ant
       }
       for (const lem of (d.lembretes || []).filter(l => l.ativo)) {
         for (const occ of ocorrencias(lem, tz, agora - JANELA, limite)) {
-          if ((d.ultimos || {})[lem.id] === occ.data) continue;
-          upd[`ultimos.${lem.id}`] = occ.data;
+          // a marca inclui a hora: se o horário do lembrete for alterado, ele volta a valer no mesmo dia
+          const marca = `${occ.data} ${lem.hora}`;
+          if ((d.ultimos || {})[lem.id] === marca) continue;
+          upd[`ultimos.${lem.id}`] = marca;
           const msg = await montar(lem, occ, d, casa, ler);
-          if (msg) await enviar(msg); else tot.pulados++;
+          if (msg) { await enviar(msg); log(`  ${doc.id} · ${lem.hora} ${lem.tipo}: enviado`); }
+          else { tot.pulados++; log(`  ${doc.id} · ${lem.hora} ${lem.tipo}: sem necessidade (nada pendente ou não é o dia)`); }
         }
       }
       if (removido) continue;
@@ -183,6 +187,10 @@ async function rodar({ db, messaging, agora = Date.now(), log = console.log, ant
     }
   }
   log(`enviados: ${tot.enviados} · sem necessidade: ${tot.pulados} · removidos: ${tot.removidos} · erros: ${tot.erros}`);
+  try {
+    const prox = await db.collection('dispositivos').where('proximo', '>', limite).orderBy('proximo').limit(3).get();
+    prox.docs.forEach(x => log(`próximo: ${x.id} às ${new Date(x.data().proximo).toLocaleString('pt-BR', { timeZone: x.data().tz || 'America/Sao_Paulo' })}`));
+  } catch (e) { /* só informativo */ }
   return tot;
 }
 

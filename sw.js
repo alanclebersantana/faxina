@@ -1,10 +1,13 @@
 /* Service worker — Bora pra Faxina!
    Ao publicar uma nova versão do index.html, aumente o número de CACHE. */
-const CACHE = 'bora-pra-faxina-v2';
+const CACHE = 'bora-pra-faxina-v3';
 const ASSETS = ['./', './index.html', './manifest.json', './instalar.html', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png', './icons/badge-96.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // Guarda cada arquivo separadamente: se um faltar, a instalação não falha por isso
+  e.waitUntil(caches.open(CACHE)
+    .then(c => Promise.allSettled(ASSETS.map(u => c.add(u))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
