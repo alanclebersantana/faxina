@@ -11,6 +11,8 @@
    ===================================================================== */
 
 const JANELA = 2 * 60 * 60 * 1000; // envia lembretes atrasados em até 2h (o GitHub às vezes atrasa)
+// Antecipação: envia o que vence nos próximos minutos, para compensar o atraso do GitHub
+const ANTECEDENCIA = (Number(process.env.ANTECEDENCIA_MIN) || 3) * 60 * 1000;
 
 const pad = n => String(n).padStart(2, '0');
 const ymdUTC = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
@@ -123,13 +125,14 @@ async function montar(lem, occ, disp, casa, ler) {
 }
 
 /* ---------- execução ---------- */
-async function rodar({ db, messaging, agora = Date.now(), log = console.log }) {
+async function rodar({ db, messaging, agora = Date.now(), log = console.log, antecedencia = ANTECEDENCIA }) {
+  const limite = agora + antecedencia;
   const cache = new Map();
   const ler = async path => {
     if (!cache.has(path)) cache.set(path, db.doc(path).get().then(s => (s.exists ? s.data() : null)));
     return cache.get(path);
   };
-  const snap = await db.collection('dispositivos').where('proximo', '<=', agora).get();
+  const snap = await db.collection('dispositivos').where('proximo', '<=', limite).get();
   log(`${snap.size} aparelho(s) com lembrete vencido`);
   const tot = { enviados: 0, pulados: 0, removidos: 0, erros: 0 };
 
@@ -165,7 +168,7 @@ async function rodar({ db, messaging, agora = Date.now(), log = console.log }) {
         upd.teste = false;
       }
       for (const lem of (d.lembretes || []).filter(l => l.ativo)) {
-        for (const occ of ocorrencias(lem, tz, agora - JANELA, agora)) {
+        for (const occ of ocorrencias(lem, tz, agora - JANELA, limite)) {
           if ((d.ultimos || {})[lem.id] === occ.data) continue;
           upd[`ultimos.${lem.id}`] = occ.data;
           const msg = await montar(lem, occ, d, casa, ler);
@@ -173,7 +176,7 @@ async function rodar({ db, messaging, agora = Date.now(), log = console.log }) {
         }
       }
       if (removido) continue;
-      upd.proximo = proximoEnvio(d.lembretes, tz, agora + 1);
+      upd.proximo = proximoEnvio(d.lembretes, tz, limite + 1);
       await doc.ref.update(upd);
     } catch (e) {
       tot.erros++; log('erro no aparelho', doc.id, e.message);
