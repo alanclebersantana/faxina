@@ -18,6 +18,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js"></script>
 <style>
 :root{--acc:#E5779F;--bg:#FBF8F5;--card:#FFFFFF;--ink:#2A2532;--muted:#8C8496;--line:#F0EAE5;--soft:#F6F1EC;--red:#DD5258;--redbg:#FDEDED;--shadow:0 1px 2px rgba(40,30,50,.04),0 8px 24px rgba(40,30,50,.06);--c:#E5779F}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15131A;--card:#211E27;--ink:#F3EFF6;--muted:#9E96A9;--line:#2E2A35;--soft:#2A2631;--redbg:#3B2226;--shadow:0 1px 2px rgba(0,0,0,.3)}}
@@ -213,6 +214,23 @@ textarea.inp{width:100%;resize:vertical;min-height:56px;margin-top:8px}
 .pal .sw{display:flex}.pal .sw i{width:9px;height:22px;display:block}
 .pal .sw i:first-child{border-radius:6px 0 0 6px}.pal .sw i:last-child{border-radius:0 6px 6px 0}
 .pal small{font-size:10.5px;font-weight:700;color:var(--muted);white-space:nowrap}
+.m2{color:var(--muted);font-size:13.5px;line-height:1.5;margin:0 0 12px}
+.lrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.lrow:first-of-type{border-top:0}
+.lrow.off .lmain{opacity:.5}
+.lmain{flex:1;display:flex;align-items:center;gap:12px;text-align:left;min-width:0}
+.lmain .ri{width:40px;height:40px;border-radius:13px}
+.lt{min-width:0;font-size:14.5px}.lt b{font-size:17px;font-weight:900}
+.lt small{display:block;color:var(--muted);font-size:12.5px;font-weight:600}
+.lsw{width:46px;height:28px;border-radius:99px;background:var(--line);position:relative;flex:none;transition:.2s}
+.lsw i{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.2s}
+.lsw.on{background:var(--acc)}.lsw.on i{left:21px}
+.pushask{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid color-mix(in srgb,var(--acc) 35%,var(--line));border-radius:20px;padding:12px;margin:0 0 14px;box-shadow:var(--shadow)}
+.pushask .ri{width:40px;height:40px;border-radius:13px}
+.pushask b{display:block;font-size:14px}.pushask small{display:block;color:var(--muted);font-size:12px;line-height:1.35}
+.sats.dias7{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.sats.dias7 button{padding:10px 0;font-size:12.5px}
+.chip2{padding:8px 11px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-weight:700;font-size:12.5px}
+.chip2.on{border-color:var(--acc);color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,var(--card))}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:14px;font-size:13.5px;font-weight:700;z-index:60;animation:up .3s;box-shadow:0 10px 30px rgba(0,0,0,.2);max-width:90vw;text-align:center}
 .empty{text-align:center;color:var(--muted);font-size:13.5px;padding:24px}
 .note{font-size:12px;color:var(--muted);text-align:center;margin:10px 0 0;line-height:1.5}
@@ -247,14 +265,17 @@ img.av{display:block}
    (Console do Firebase → Configurações do projeto → Seus apps → App da Web)
    ===================================================================== */
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyACop0MP4sckE0NWfvyZVtmoyd8aImeHlk",
-  authDomain: "faxina-6d933.firebaseapp.com",
-  projectId: "faxina-6d933",
-  storageBucket: "faxina-6d933.firebasestorage.app",
-  messagingSenderId: "100162698356",
-  appId: "1:100162698356:web:7dc906d784c6a838e32521"
+  apiKey: "COLE_AQUI_SUA_API_KEY",
+  authDomain: "SEU-PROJETO.firebaseapp.com",
+  projectId: "SEU-PROJETO",
+  storageBucket: "SEU-PROJETO.appspot.com",
+  messagingSenderId: "000000000000",
+  appId: "1:000000000000:web:0000000000000000"
 };
-const APP_VERSION = '1.0.0';
+/* Chave das notificações push (Firebase → Configurações do projeto → Cloud Messaging →
+   Certificados push da Web → Gerar par de chaves). Cole a chave pública aqui. */
+const FIREBASE_VAPID_KEY = "COLE_AQUI_SUA_VAPID_KEY";
+const APP_VERSION = '1.1.0';
 
 /* ---------- ícones ---------- */
 const P={
@@ -285,7 +306,7 @@ bulb:'M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5
 flame:'M12 21c-4 0-6.5-2.7-6.5-6.2 0-3.6 3-5.6 3.5-9.3 2 1.2 3 3 3 5 1-1 1.5-2.2 1.5-3.5 2.8 1.8 5 4.6 5 7.8 0 3.5-2.5 6.2-6.5 6.2z',
 cloud:'M7 18h10a4 4 0 0 0 .6-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z',moon:'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z',
 user:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0',redo:'M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5',
-download:'M12 4v11M7 10l5 5 5-5M5 20h14',upload:'M12 20V9M7 14l5-5 5 5M5 4h14',logout:'M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4',
+download:'M12 4v11M7 10l5 5 5-5M5 20h14',bell:'M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0',upload:'M12 20V9M7 14l5-5 5 5M5 4h14',logout:'M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4',
 share:'M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM8.6 13.5l6.8 4M15.4 6.5l-6.8 4',
 copy:'M9 9h11v11H9zM5 15H4V4h11v1',mail:'M3 6h18v12H3zM3 7l9 6 9-6',key:'M14 10a4 4 0 1 0-3.5 4L12 15.5h2v2h2v2h3v-3l-5.5-5.5'
 };
@@ -572,7 +593,7 @@ function afterData(){
  buildS();
  const a=document.activeElement;
  if(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA')&&document.getElementById('app').contains(a)){deferRender=true}else render();
- if(!BOOTED){BOOTED=true;document.getElementById('nav').parentElement.style.display='';setTimeout(()=>{checkRollover();dailyBackup()},600)}
+ if(!BOOTED){BOOTED=true;document.getElementById('nav').parentElement.style.display='';setTimeout(()=>{checkRollover();dailyBackup();pushRefresh()},600)}
 }
 document.addEventListener('focusout',()=>setTimeout(()=>{if(deferRender&&S){deferRender=false;const a=document.activeElement;if(!(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA')))render()}},50));
 
@@ -689,6 +710,7 @@ function vHoje(){
   const n=Lt.length+C.length;const ds=[...new Set(Lt.map(x=>DAYS[x.d].s.toLowerCase()))];if(C.length)ds.push('semana passada');
   h+=`<div class="alert">${ic('alert')}<div>${n} tarefa${n>1?'s':''} atrasada${n>1?'s':''}<span>De ${ds.join(', ')}. Elas estão logo abaixo.</span></div></div>`;
  }
+ if(d===TODAY)h+=pushBanner();
  h+=`<div class="hero"><div style="flex:1;min-width:0"><div class="eyebrow">${d===TODAY?'Hoje · ':''}${dt.getDate()} de ${MESES[dt.getMonth()]}</div><h1>${D.n}</h1><p>${esc(theme)}</p>
  <div class="meta"><span class="chip">${ic('check','style="width:14px;height:14px"')} ${a}/${b}</span>${dayDone(d)?`<span class="chip">🥈 Prata</span>`:''}</div></div>${ring(pct,D.c,'do dia')}</div>`;
  h+=`<div class="strip">${DAYS.map((x,i)=>{const dd=dateOf(i);const late=i<TODAY&&started(i)&&!dayDone(i);return`<button class="dbtn ${i===d?'on':''} ${i===TODAY?'today':''}" style="--dc:${x.c}" data-act="day" data-d="${i}"><small>${x.s}</small><b>${dd.getDate()}</b><div class="dot ${dayDone(i)?'full':late?'late':''}"></div></button>`}).join('')}</div>`;
@@ -769,6 +791,7 @@ function vAjustes(){
  if(BACKUPS===null){BACKUPS=[];loadBackups()}
  let h=`<div class="sec" style="margin-top:8px"><h2>Ajustes</h2></div>`;
  h+=`<div class="card"><h3>Conta</h3><div class="prow" style="border:0;padding-top:0">${USER.photoURL?`<img src="${esc(USER.photoURL)}" class="av" style="object-fit:cover" referrerpolicy="no-referrer" alt="">`:`<span class="av" style="background:var(--acc)">${esc((USER.displayName||USER.email||'?')[0].toUpperCase())}</span>`}<span style="flex:1;min-width:0"><b>${esc(USER.displayName||'Minha conta')}</b><br><small style="color:var(--muted)">${esc(USER.email||'')}</small></span><button class="btn" data-act="logout">${ic('logout','style="width:15px;height:15px"')} Sair</button></div></div>`;
+ h+=lembretesCard();
  h+=`<div class="card"><h3>Casa <small>${(CASA.membros||[]).length} conta${(CASA.membros||[]).length>1?'s':''} conectada${(CASA.membros||[]).length>1?'s':''}</small></h3>
  <input class="inp" style="width:100%" value="${esc(CASA.nome||'')}" data-ch="casaNome" placeholder="Nome da casa">
  <div class="invite"><div><small>Código de convite</small><b>${esc(CASA.codigo||'')}</b></div><button class="ib" data-act="copyCode" title="Copiar">${ic('copy')}</button><button class="btn dark" data-act="shareCode">${ic('share','style="width:15px;height:15px"')} Convidar</button></div>
@@ -840,7 +863,7 @@ const A={
  emailIn:async()=>{const e=$v('lgEmail'),p=$v('lgPass');if(!e||!p)return toast('Preencha e-mail e senha');try{await auth.signInWithEmailAndPassword(e,p)}catch(err){toast(authMsg(err))}},
  emailUp:async()=>{const e=$v('lgEmail'),p=$v('lgPass');if(!e||!p)return toast('Preencha e-mail e senha');try{await auth.createUserWithEmailAndPassword(e,p)}catch(err){toast(authMsg(err))}},
  emailReset:async()=>{const e=$v('lgEmail');if(!e)return toast('Digite seu e-mail primeiro');try{await auth.sendPasswordResetEmail(e);toast('Enviamos um link para '+e)}catch(err){toast(authMsg(err))}},
- logout:()=>{stopListeners();S=null;auth.signOut()},
+ logout:async()=>{await pushRemove();stopListeners();S=null;auth.signOut()},
  createCasa:()=>createCasa($v('casaNome')),
  onbJoin:()=>{onbMode='join';showOnboarding();setTimeout(()=>document.getElementById('joinCode').focus(),50)},
  onbBack:()=>{onbMode='opts';showOnboarding()},
@@ -865,7 +888,7 @@ const A={
  togC:e=>{const c=S.carried[+e.dataset.i];if(!c)return;if(c.done)delete c.done;else c.done={by:S.me,em:Date.now()};writeCarried();render();if(c.done)toast('Pendência da semana passada concluída ✓')},
  who:()=>modal(`<h3>Quem está marcando?</h3><p class="m">Neste aparelho, as tarefas concluídas ficam com o nome dessa pessoa.</p>${S.people.map(p=>`<button class="opt ${p.id===S.me?'on':''}" data-act="setMe" data-p="${p.id}"><span class="av" style="background:${p.color}">${esc(p.name[0])}</span><b style="flex:1">${esc(p.name)}</b>${p.id===S.me?ic('check'):''}</button>`).join('')}<button class="btn full" data-act="goPeople">${ic('plus')} Cadastrar pessoa</button>`),
  goPeople:()=>{close();UI.tab='ajustes';render();setTimeout(()=>{const i=document.getElementById('newPerson');if(i){i.scrollIntoView({block:'center'});i.focus()}},60)},
- setMe:e=>{S.me=e.dataset.p;L.me[CASA_ID]=S.me;saveLocal();close();render();toast('Marcando como '+person(S.me).name)},
+ setMe:e=>{S.me=e.dataset.p;L.me[CASA_ID]=S.me;saveLocal();if(L.push&&L.push.on)pushSave();close();render();toast('Marcando como '+person(S.me).name)},
  close:()=>close(),
  ovclose:(el,ev)=>{if(!LOCKED&&ev.target===el)close()},
  delItem:e=>{const r=S.rooms[e.dataset.r];r.items=r.items.filter(i=>i.id!==e.dataset.i);saveConfig();render()},
@@ -921,6 +944,161 @@ document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const t=e.targ
  else if(t.id==='lgPass')A.emailIn();else if(t.id==='joinCode')(document.querySelector('[data-act=joinFromModal]')?A.joinFromModal:A.joinGo)();else if(t.id==='casaNome'&&!S)A.createCasa();
 });
 
+/* ---------- lembretes (notificações push) ---------- */
+const DEFAULT_LEMBRETES=()=>[
+ {id:'l1',tipo:'dia',hora:'08:00',dias:[0,1,2,3,4,5,6],ativo:true},
+ {id:'l2',tipo:'pendentes',hora:'19:00',dias:[0,1,2,3,4,5,6],ativo:true},
+ {id:'l3',tipo:'mensal',hora:'09:00',dias:[5],ativo:true}];
+const TIPOS={
+ dia:{n:'Tarefas do dia',d:'Resumo do que tem para fazer hoje',i:'sun'},
+ pendentes:{n:'Se faltar algo',d:'Só avisa se houver tarefas pendentes',i:'alert'},
+ mensal:{n:'Faxina do mês',d:'No sábado escolhido para a faxina pesada',i:'sparkle'},
+ livre:{n:'Mensagem livre',d:'Um lembrete com o seu texto',i:'bulb'}};
+const TZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'America/Sao_Paulo'}catch(e){return'America/Sao_Paulo'}})();
+const IS_IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const VAPID_OK=typeof FIREBASE_VAPID_KEY==='string'&&FIREBASE_VAPID_KEY.length>40&&!/COLE_AQUI/.test(FIREBASE_VAPID_KEY);
+let MSG=null,MSG_OK=null;
+function initMessaging(){
+ try{
+  if(!window.firebase||!firebase.messaging){MSG_OK=false;return}
+  Promise.resolve(firebase.messaging.isSupported()).then(ok=>{MSG_OK=!!ok;if(ok)MSG=firebase.messaging();if(S)render()}).catch(()=>{MSG_OK=false});
+ }catch(e){MSG_OK=false}
+}
+function pushState(){
+ if(!VAPID_OK)return'novapid';
+ if(IS_IOS&&!isStandalone())return'ios';
+ if(!('Notification' in window)||!('serviceWorker' in navigator))return'nosupport';
+ if(MSG_OK===null)return'loading';
+ if(!MSG_OK)return'nosupport';
+ if(Notification.permission==='denied')return'denied';
+ return L.push&&L.push.on&&Notification.permission==='granted'?'on':'off';
+}
+
+/* horários no fuso do aparelho (o servidor usa exatamente a mesma conta) */
+function tzOff(ms,tz){const p={};new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}).formatToParts(new Date(ms)).forEach(x=>p[x.type]=x.value);return Date.UTC(+p.year,p.month-1,+p.day,+p.hour%24,+p.minute,+p.second)-Math.floor(ms/1000)*1000}
+function zoned(y,m,d,h,mi,tz){const g=Date.UTC(y,m-1,d,h,mi);const o=tzOff(g,tz);let r=g-o;const o2=tzOff(r,tz);if(o2!==o)r=g-o2;return r}
+function localYMD(ms,tz){const p={};new Intl.DateTimeFormat('en-US',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(ms)).forEach(x=>p[x.type]=x.value);return[+p.year,+p.month,+p.day]}
+function ocorrencias(lem,tz,de,ate){
+ const out=[];const[y,m,d]=localYMD(de,tz);const[hh,mm]=String(lem.hora||'08:00').split(':').map(Number);
+ const dias=lem.tipo==='mensal'?[5]:(lem.dias||[]);const n=Math.ceil((ate-de)/864e5)+1;
+ for(let k=-1;k<=n;k++){
+  const dt=new Date(Date.UTC(y,m-1,d+k));const wd=(dt.getUTCDay()+6)%7;if(!dias.includes(wd))continue;
+  const Y=dt.getUTCFullYear(),M=dt.getUTCMonth()+1,D=dt.getUTCDate();const ms=zoned(Y,M,D,hh,mm,tz);
+  if(ms>=de&&ms<=ate)out.push({ms,data:`${Y}-${pad(M)}-${pad(D)}`,wd,Y,M,D,hh});
+ }
+ return out.sort((a,b)=>a.ms-b.ms);
+}
+function proximoEnvio(lems,tz,de){let best=null;(lems||[]).filter(l=>l.ativo).forEach(l=>{const o=ocorrencias(l,tz,de,de+9*864e5)[0];if(o&&(best===null||o.ms<best))best=o.ms});return best}
+
+const devRef=()=>db.collection('dispositivos').doc(L.push.devId);
+const newDevId=()=>'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+function devFields(){return{uid:USER.uid,casaId:CASA_ID,pessoa:(S&&S.me)||null,tz:TZ,lembretes:L.push.lembretes,ativo:true,
+ proximo:proximoEnvio(L.push.lembretes,TZ,Date.now()-2*36e5),app:location.origin+location.pathname.replace(/[^/]*$/,''),atualizado:FV.serverTimestamp()}}
+async function pushSync(retry){
+ if(!L.push||!L.push.on||!CASA_ID||!USER||!MSG)return;
+ const limite=(pr,ms,msg)=>Promise.race([pr,new Promise((_,rej)=>setTimeout(()=>rej(new Error(msg)),ms))]);
+ const reg=await limite(navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready),15000,'o app não terminou de instalar no navegador. Recarregue a página e tente de novo.');
+ const token=await limite(MSG.getToken({vapidKey:FIREBASE_VAPID_KEY,serviceWorkerRegistration:reg}),20000,'sem resposta do serviço de notificações. Verifique a internet.');
+ if(!token)throw new Error('O navegador não gerou o token de notificação.');
+ try{await devRef().set(Object.assign(devFields(),{token,plataforma:navigator.userAgent.slice(0,140)}),{merge:true})}
+ catch(e){if(e.code==='permission-denied'&&!retry){L.push.devId=newDevId();saveLocal();return pushSync(true)}throw e}
+ L.push.casa=CASA_ID;saveLocal();
+}
+let pushSaveT;
+function pushSave(){saveLocal();clearTimeout(pushSaveT);pushSaveT=setTimeout(()=>{devRef().set(devFields(),{merge:true}).catch(e=>{console.error(e);pushSync().catch(()=>{})})},300)}
+async function pushEnable(){
+ try{
+  const perm=await Notification.requestPermission();
+  if(perm!=='granted'){render();return toast(perm==='denied'?'Notificações bloqueadas. Libere nas configurações do navegador.':'Permissão não concedida.')}
+  const prev=L.push||{};
+  L.push={devId:prev.devId||newDevId(),lembretes:prev.lembretes&&prev.lembretes.length?prev.lembretes:DEFAULT_LEMBRETES(),on:true,casa:prev.casa};saveLocal();
+  toast('Ativando…');await pushSync();render();toast('Lembretes ativados neste aparelho 🔔');
+ }catch(e){console.error(e);if(L.push)L.push.on=false;saveLocal();render();toast('Não foi possível ativar: '+(e.code||e.message))}
+}
+async function pushRemove(){if(L.push&&L.push.on&&L.push.devId){try{await devRef().delete()}catch(e){}}}
+async function pushRefresh(){
+ if(!L.push||!L.push.on)return;
+ if(!('Notification' in window)||Notification.permission!=='granted'){L.push.on=false;saveLocal();return}
+ const wait=()=>new Promise(r=>{const t=setInterval(()=>{if(MSG_OK!==null){clearInterval(t);r()}},150);setTimeout(()=>{clearInterval(t);r()},6000)});
+ await wait();pushSync().catch(e=>console.warn('push',e));
+}
+
+/* textos */
+const DS=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+function diasTxt(l){
+ if(l.tipo==='mensal')return'No sábado da faxina do mês';
+ const d=(l.dias||[]).slice().sort();const k=d.join();
+ if(k==='0,1,2,3,4,5,6')return'Todos os dias';if(k==='0,1,2,3,4')return'Segunda a sexta';if(k==='0,1,2,3,4,5')return'Segunda a sábado';if(k==='5,6')return'Fim de semana';
+ return d.map(i=>DS[i]).join(', ')||'Nenhum dia';
+}
+function lembretesCard(){
+ const st=pushState();
+ let h=`<div class="card" id="cardLembretes"><h3>Lembretes no celular <small>${st==='on'?'ativos neste aparelho':''}</small></h3>`;
+ const p=t=>`<p class="m2">${t}</p>`;
+ if(st==='loading')h+=p('Verificando o suporte a notificações…');
+ else if(st==='novapid')h+=p('Para ativar as notificações, falta colar a <b>chave VAPID</b> do Firebase no início do script do index.html. O passo a passo está no README.');
+ else if(st==='ios')h+=p('No iPhone, as notificações só funcionam com o app <b>instalado na tela de início</b> (iOS 16.4 ou mais novo). Instale e abra o app pelo ícone.')+`<a class="btn full" href="instalar.html" style="text-decoration:none">📲 Como instalar</a>`;
+ else if(st==='nosupport')h+=p('Este navegador não suporta notificações. No Android, use o Chrome; no iPhone, instale o app pelo Safari.');
+ else if(st==='denied')h+=p('As notificações estão <b>bloqueadas</b> para o app. No Android: segure o ícone do app → <b>Informações do app → Notificações → Permitir</b>. No navegador: toque no cadeado ao lado do endereço → Permissões → Notificações.');
+ else if(st==='off')h+=p('Receba avisos no celular <b>mesmo com o app fechado</b>: as tarefas do dia de manhã, o que ficou faltando à noite e o sábado da faxina pesada. Você escolhe os dias e os horários.')+`<button class="btn dark full" data-act="pushOn">${ic('bell')} Ativar lembretes</button>`;
+ else{
+  const ls=L.push.lembretes||[];
+  h+=ls.map(l=>`<div class="lrow ${l.ativo?'':'off'}"><button class="lmain" data-act="lemEdit" data-id="${l.id}"><span class="ri" style="--rc:var(--acc)">${ic((TIPOS[l.tipo]||TIPOS.livre).i)}</span><span class="lt"><b>${esc(l.hora)}</b> · ${esc(l.tipo==='livre'&&l.msg?l.msg:(TIPOS[l.tipo]||TIPOS.livre).n)}<small>${diasTxt(l)}</small></span></button><button class="lsw ${l.ativo?'on':''}" data-act="lemToggle" data-id="${l.id}" aria-label="Ligar ou desligar"><i></i></button></div>`).join('')||'<div class="empty">Nenhum lembrete. Crie um abaixo.</div>';
+  h+=`<button class="btn full" style="margin-top:10px" data-act="lemNew">${ic('plus')} Novo lembrete</button>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><button class="btn" data-act="pushTest">${ic('bell','style="width:15px;height:15px"')} Testar</button><button class="btn red" data-act="pushOff">Desativar</button></div>
+  <p class="note" style="text-align:left">Cada aparelho tem os próprios lembretes. Eles chegam em até uns 15 minutos do horário escolhido e só avisam quando faz sentido (ex.: "Se faltar algo" não toca se o dia já estiver completo).</p>`;
+ }
+ return h+'</div>';
+}
+function pushBanner(){
+ if(L.pushAsk||pushState()!=='off')return'';
+ return`<div class="pushask"><span class="ri" style="--rc:var(--acc)">${ic('bell')}</span><div style="flex:1;min-width:0"><b>Quer lembretes no celular?</b><small>Avisos nos horários que você escolher, mesmo com o app fechado.</small></div><button class="btn dark" data-act="pushOn">Ativar</button><button class="ib" data-act="pushAskNo" aria-label="Agora não">${ic('x')}</button></div>`;
+}
+let TL=null;
+function lemModal(){
+ const l=TL;const isNew=!(L.push.lembretes||[]).some(x=>x.id===l.id);
+ let h=`<h3>${isNew?'Novo lembrete':'Editar lembrete'}</h3><p class="m" style="margin:10px 0 8px">Tipo</p>
+ ${Object.entries(TIPOS).map(([k,t])=>`<button class="opt ${l.tipo===k?'on':''}" data-act="lemTipo" data-t="${k}"><span class="ri" style="--rc:var(--acc);width:36px;height:36px;border-radius:12px">${ic(t.i)}</span><span style="flex:1"><b>${t.n}</b><br><small style="color:var(--muted)">${t.d}</small></span>${l.tipo===k?ic('check'):''}</button>`).join('')}
+ <p class="m" style="margin:14px 0 8px">Horário</p>
+ <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input type="time" class="inp" id="lemHora" value="${esc(l.hora)}" style="flex:0 0 150px;font-size:18px;font-weight:800">
+ ${[['Manhã','08:00'],['Tarde','14:00'],['Noite','19:00']].map(([n,v])=>`<button class="chip2 ${l.hora===v?'on':''}" data-act="lemHoraQ" data-v="${v}">${n} · ${v}</button>`).join('')}</div>`;
+ if(l.tipo!=='mensal')h+=`<p class="m" style="margin:14px 0 8px">Dias</p><div class="sats dias7">${DAYS.map((x,i)=>`<button style="--c:${x.c}" class="${(l.dias||[]).includes(i)?'on':''}" data-act="lemDia" data-d="${i}">${x.s}</button>`).join('')}</div>
+ <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">${[['Todos','0123456'],['Seg a Sex','01234'],['Fim de semana','56']].map(([n,v])=>`<button class="chip2" data-act="lemDiasQ" data-v="${v}">${n}</button>`).join('')}</div>`;
+ else h+=`<p class="note" style="text-align:left;margin-top:10px">Toca só no sábado escolhido na aba <b>Mensal</b>, e não toca se a faxina do mês já estiver completa.</p>`;
+ if(l.tipo==='livre')h+=`<p class="m" style="margin:14px 0 8px">Mensagem</p><input class="inp" id="lemMsg" style="width:100%" maxlength="120" placeholder="Ex.: Hora de lavar a louça 🍽️" value="${esc(l.msg||'')}">`;
+ h+=`<button class="btn dark full" style="margin-top:16px" data-act="lemSave">Salvar lembrete</button>`;
+ if(!isNew)h+=`<button class="btn full red" style="margin-top:8px" data-act="lemDel">Excluir lembrete</button>`;
+ modal(h);
+}
+function lemRead(){if(!TL)return;const h=document.getElementById('lemHora');if(h&&h.value)TL.hora=h.value;const m=document.getElementById('lemMsg');if(m)TL.msg=m.value.trim()}
+Object.assign(A,{
+ pushOn:()=>pushEnable(),
+ pushOff:async()=>{await pushRemove();L.push.on=false;saveLocal();render();toast('Lembretes desativados neste aparelho')},
+ pushAskNo:()=>{L.pushAsk=1;saveLocal();render()},
+ pushTest:async()=>{
+  try{const reg=await navigator.serviceWorker.ready;await reg.showNotification('🔔 Assim chegam os lembretes',{body:'Teste local. Em até 15 min chega também um teste enviado pelo servidor.',icon:'icons/icon-192.png',badge:'icons/badge-96.png',tag:'bpf-teste-local'})}catch(e){toast('Não foi possível mostrar a notificação: '+e.message)}
+  devRef().set({teste:true,proximo:Date.now()},{merge:true}).catch(e=>toast('Erro ao agendar o teste: '+(e.code||e.message)));
+ },
+ lemToggle:e=>{const l=L.push.lembretes.find(x=>x.id===e.dataset.id);if(!l)return;l.ativo=!l.ativo;pushSave();render()},
+ lemEdit:e=>{const l=L.push.lembretes.find(x=>x.id===e.dataset.id);if(!l)return;TL=JSON.parse(JSON.stringify(l));lemModal()},
+ lemNew:()=>{TL={id:'l'+Date.now().toString(36),tipo:'livre',hora:'12:00',dias:[0,1,2,3,4,5,6],ativo:true,msg:''};lemModal()},
+ lemTipo:e=>{lemRead();TL.tipo=e.dataset.t;if(TL.tipo==='mensal')TL.dias=[5];else if(!TL.dias||!TL.dias.length||(TL.dias.length===1&&TL.dias[0]===5))TL.dias=[0,1,2,3,4,5,6];lemModal()},
+ lemHoraQ:e=>{lemRead();TL.hora=e.dataset.v;lemModal()},
+ lemDia:e=>{lemRead();const i=+e.dataset.d;TL.dias=TL.dias.includes(i)?TL.dias.filter(x=>x!==i):[...TL.dias,i].sort();lemModal()},
+ lemDiasQ:e=>{lemRead();TL.dias=e.dataset.v.split('').map(Number);lemModal()},
+ lemSave:()=>{
+  lemRead();
+  if(!/^\d{2}:\d{2}$/.test(TL.hora||''))return toast('Escolha um horário');
+  if(TL.tipo!=='mensal'&&!(TL.dias||[]).length)return toast('Escolha pelo menos um dia');
+  if(TL.tipo==='livre'&&!TL.msg)return toast('Escreva a mensagem do lembrete');
+  if(TL.tipo!=='livre')delete TL.msg;
+  const ls=L.push.lembretes;const i=ls.findIndex(x=>x.id===TL.id);TL.ativo=true;if(i>=0)ls[i]=TL;else ls.push(TL);
+  ls.sort((a,b)=>a.hora<b.hora?-1:1);TL=null;pushSave();close();render();toast('Lembrete salvo 🔔');
+ },
+ lemDel:()=>{L.push.lembretes=L.push.lembretes.filter(x=>x.id!==TL.id);TL=null;pushSave();close();render();toast('Lembrete excluído')}
+});
+
 /* ---------- virada de dia com o app aberto ---------- */
 function checkClock(){
  if(!CASA_ID||!S)return;
@@ -938,6 +1116,7 @@ applyPalette();
 if(!CONFIGURED||!window.firebase)showNotConfigured();
 else{
  showLoading('Abrindo…');
+ initMessaging();
  auth.getRedirectResult().catch(e=>{if(e&&e.code)toast(authMsg(e))});
  auth.onAuthStateChanged(onAuth);
 }

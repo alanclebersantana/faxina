@@ -19,6 +19,17 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Aparelhos que recebem lembretes: cada conta só mexe nos próprios.
+    // O envio é feito pelo servidor (GitHub Actions), que usa a conta de serviço e não passa por estas regras.
+    match /dispositivos/{id} {
+      allow read, delete: if logado() && resource.data.uid == request.auth.uid;
+      allow create: if logado() && request.resource.data.uid == request.auth.uid
+                    && request.auth.uid in casa(request.resource.data.casaId).membros;
+      allow update: if logado() && resource.data.uid == request.auth.uid
+                    && request.resource.data.uid == request.auth.uid
+                    && request.auth.uid in casa(request.resource.data.casaId).membros;
+    }
+
     match /casas/{casaId} {
       allow read: if logado() && request.auth.uid in resource.data.membros;
       allow create: if logado() && request.resource.data.membros == [request.auth.uid];

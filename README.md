@@ -13,8 +13,10 @@ PWA em arquivo único (`index.html`), sem ferramentas de build. Hospedado no **G
 | `index.html` | O app inteiro (HTML, CSS e JavaScript) |
 | `instalar.html` | Página de instalação com instruções para Android, iPhone e computador |
 | `manifest.json` | Nome, cores e ícones para instalar no celular |
-| `sw.js` | Service worker: abre o app mesmo offline |
-| `icons/` | Ícones do app (192, 512, maskable e Apple) |
+| `sw.js` | Service worker: abre o app offline e mostra as notificações |
+| `icons/` | Ícones do app (192, 512, maskable, Apple e o ícone da barra de notificações) |
+| `notificacoes/` | Script que envia os lembretes (roda no GitHub Actions) |
+| `.github/workflows/lembretes.yml` | Agenda o envio dos lembretes a cada 15 minutos |
 | `firestore.rules` | Regras de segurança do banco de dados |
 
 ---
@@ -75,6 +77,58 @@ Mande para a família o link da página de instalação: `https://SEU-USUARIO.gi
 4. Em **Ajustes → Pessoas da casa**, cadastre todo mundo, inclusive quem não tem conta (por exemplo, a Laura).
 5. Em cada aparelho, toque no **avatar do topo** para escolher quem está marcando as tarefas.
 
+## 6. Ativar os lembretes no celular 🔔
+
+Os lembretes chegam **mesmo com o app fechado**. Quem envia é um robô gratuito do GitHub (GitHub Actions), que roda a cada 15 minutos, confere no Firebase quem tem lembrete vencido e dispara a notificação pelo Firebase Cloud Messaging. **Não precisa do plano pago do Firebase.**
+
+### 6.1 Chave das notificações (VAPID)
+
+1. No Firebase, clique na engrenagem ⚙️ → **Configurações do projeto → Cloud Messaging**.
+2. Em **Configuração da Web → Certificados push da Web**, clique em **Gerar par de chaves**.
+3. Copie a chave (um texto longo que começa com `B`).
+4. No `index.html`, logo abaixo do `FIREBASE_CONFIG`, cole a chave em:
+
+```js
+const FIREBASE_VAPID_KEY = "BJx...sua-chave...";
+```
+
+### 6.2 Conta de serviço (para o robô enviar)
+
+1. No Firebase: ⚙️ → **Configurações do projeto → Contas de serviço**.
+2. Clique em **Gerar nova chave privada** e confirme. Um arquivo `.json` será baixado.
+3. No GitHub, abra o repositório e vá em **Settings → Secrets and variables → Actions → New repository secret**.
+   - **Name:** `FIREBASE_SERVICE_ACCOUNT`
+   - **Secret:** cole **todo o conteúdo** do arquivo `.json`
+4. Clique em **Add secret**. Depois apague o arquivo `.json` do seu computador.
+
+> ⚠️ Nunca envie esse `.json` para o repositório. Ele dá acesso total ao seu Firebase e só pode ficar guardado como *secret*.
+
+### 6.3 Ligar o robô
+
+1. Envie para o GitHub também as pastas `notificacoes/` e `.github/` (a pasta `.github` começa com ponto e fica oculta em alguns computadores).
+2. No repositório, abra a aba **Actions**. Se aparecer um aviso, clique em **I understand my workflows, go ahead and enable them**.
+3. Clique em **Lembretes → Run workflow** para testar. Em uns 30 segundos o resultado aparece em verde ✅ com a mensagem `0 aparelho(s) com lembrete vencido`.
+
+### 6.4 No celular
+
+1. Abra o app **instalado** e toque em **Ativar** (no aviso da tela Hoje ou em **Ajustes → Lembretes no celular**).
+2. Permita as notificações quando o celular perguntar.
+3. Ajuste os horários e os dias como quiser. Cada aparelho tem os próprios lembretes.
+4. Toque em **Testar**. Uma notificação aparece na hora, e outra, enviada pelo robô, chega em até 15 minutos.
+
+| Lembrete | Quando toca |
+|---|---|
+| ☀️ Tarefas do dia | No horário escolhido, com o cômodo do dia e quantas tarefas faltam |
+| ⚠️ Se faltar algo | Só se ainda houver tarefas do dia ou atrasadas |
+| ✨ Faxina do mês | No sábado escolhido na aba Mensal, se a faxina pesada não estiver completa |
+| 💡 Mensagem livre | O texto que você escrever, nos dias e horários escolhidos |
+
+**Bom saber:**
+- **iPhone:** funciona no iOS 16.4 ou mais novo, e só com o app **instalado na tela de início** pelo Safari.
+- **Precisão:** o GitHub pode atrasar alguns minutos, principalmente na hora cheia. O lembrete chega em até uns 15 minutos do horário. Se o atraso passar de 2 horas, aquele lembrete é pulado para não tocar fora de hora.
+- **Repositório parado:** o GitHub pausa agendamentos de repositórios sem nenhuma atividade por 60 dias. O robô tenta se manter ligado sozinho, mas se você receber um e-mail do GitHub avisando da pausa, é só abrir **Actions → Lembretes → Enable workflow**.
+- **Custo:** o GitHub Actions é gratuito em repositórios públicos (como os do GitHub Pages gratuito), e o envio pelo Firebase Cloud Messaging também é gratuito.
+
 ---
 
 ## ☁️ Sincronização e backup
@@ -109,7 +163,7 @@ Mande para a família o link da página de instalação: `https://SEU-USUARIO.gi
 Depois de alterar o `index.html`, abra o `sw.js` e aumente o número da versão:
 
 ```js
-const CACHE = 'bora-pra-faxina-v2';
+const CACHE = 'bora-pra-faxina-v3';
 ```
 
 Assim os celulares baixam a versão nova na próxima vez que abrirem o app.
@@ -124,6 +178,10 @@ casas/{casaId}                  → nome, código, membros, config (cômodos, di
 casas/{casaId}/semanas/{segunda-feira}  → checks, medalhas, pendências levadas, fechada
 casas/{casaId}/meses/{AAAA-MM}          → checks da faxina mensal, sábado escolhido, atrasados
 casas/{casaId}/backups/{id}             → cópia completa em JSON
+dispositivos/{id}                       → aparelho que recebe lembretes: token, casa, pessoa,
+                                          fuso horário, lembretes e próximo envio
 ```
 
-Paleta de cores e modo claro/escuro são escolhas de cada aparelho.
+Paleta de cores, modo claro/escuro e lembretes são escolhas de cada aparelho.
+
+> Depois de atualizar o `firestore.rules`, lembre de colar o conteúdo novo em **Firestore → Regras → Publicar**. A versão com lembretes inclui a coleção `dispositivos`.

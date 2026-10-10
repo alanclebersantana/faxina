@@ -1,0 +1,4 @@
+node_modules/
+# chave da conta de serviço do Firebase: nunca envie para o GitHub
+*firebase-adminsdk*.json
+service-account*.json
